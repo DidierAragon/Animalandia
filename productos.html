@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Productos - Animalandia</title>
+  <link rel="stylesheet" href="/static/style.css">
+
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">
+      <h1>🐾 Animalandia</h1>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="productos.html">Productos</a></li>
+      <li>
+        <a href="carrito.html">
+          🛒 Carrito (<span id="contador">0</span>)
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="services">
+    <h2>Nuestros Productos</h2>
+
+    <div class="card-container">
+
+      <div class="card">
+        <h3>Alimento Premium Perro</h3>
+        <p>$80</p>
+      <button class="btn-carrito" onclick="agregarAlCarrito('Alimento Premium Perro', 80)">
+Agregar al carrito
+</button>
+      </div>
+
+
+      <div class="card">
+        <h3>Rascador para Gato</h3>
+        <p>$120</p>
+        <button class="btn-carrito" onclick="agregarAlCarrito('Rascador para Gato', 120)">
+          Agregar al carrito
+        </button>
+      </div>
+
+      <div class="card">
+        <h3>Jaula para Pájaro</h3>
+        <p>$200</p>
+        <button class="btn-carrito" onclick="agregarAlCarrito('Jaula para Pájaro', 200)">
+          Agregar al carrito
+        </button>
+      </div>
+
+      <div class="card">
+        <h3>Pecera Pequeña</h3>
+        <p>$300</p>
+        <button class="btn-carrito" onclick="agregarAlCarrito('Pecera Pequeña', 300)">
+          Agregar al carrito
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/static/script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animalandia - Tienda de Mascotas</title>
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">
+      <h1>🐾 Animalandia</h1>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="productos.html">Productos</a></li>
+      <li><a href="galeria.html">Galería</a></li>
+      <li><a href="contacto.html">Contacto</a></li>
+      <li><a href="carrito.html">Carrito (<span id="contador">0</span>)</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="carousel-container" id="inicio">
+      <div class="carousel-slide active">
+        <img src="/static/foto4.jpg" alt="Perros">
+        <div class="carousel-content">
+          <h2>Todo para tu mejor amigo</h2>
+          <p>Encuentra los mejores juguetes y accesorios.</p>
+          <button id="heroBtn">Ver Promociones</button>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <img src="/static/foto5.jpg" alt="Gatos">
+        <div class="carousel-content">
+          <h2>Especial para Gatos</h2>
+          <p></p>
+          <button class="btn-carrito" >Ver Ofertas</button>
+        </div>
+      </div>
+      <button id="prevBtn" class="carousel-control">❮</button>
+      <button id="nextBtn" class="carousel-control">❯</button>
+    </section>
+
+    <section class="services" id="productos">
+      <h2>Nuestras Categorías</h2>
+      <div class="card-container">
+        <div class="card">
+          <h3>Perros</h3>
+          <p>Alimento premium y juguetes resistentes.</p>
+          <button class="btn-carrito" onclick="agregarAlCarrito('Alimento Premium Perro', 80)">
+  Agregar al carrito
+</button>
+        </div>
+        <div class="card">
+          <h3>Gatos</h3>
+          <p>Rascadores y la mejor comida felina.</p>
+          <button class="btn-carrito" onclick="agregarAlCarrito('Rascador para Gato', 120)">
+  Agregar al carrito
+</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="gallery" id="galeria">
+      <h2>Nuestros Amigos Felices</h2>
+      <div class="gallery-grid">
+        <figure>
+          <img src="/static/foto1.jpg" alt="Perro">
+          <figcaption>Max - Cliente fiel</figcaption>
+        </figure>
+        <figure>
+          <img src="/static/foto2.jpg" alt="Gato">
+          <figcaption>Luna - Exploradora</figcaption>
+        </figure>
+        <figure>
+          <img src="/static/foto3.jpg" alt="Loro">
+          <figcaption>Paco - El charlatán</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modalTitle">Detalles</h3>
+      <p id="modalText">Cargando...</p>
+    </div>
+  </div>
+
+  <footer id="contacto">
+    <p>&copy; 2026 Animalandia — Todos los derechos reservados</p>
+  </footer>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
