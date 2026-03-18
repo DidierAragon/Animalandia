@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galería — Animalandia</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo"><h1>🐾 Animalandia</h1></div>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="productos.html">Productos</a></li>
+      <li><a href="galeria.html">Galería</a></li>
+      <li><a href="carrito.html">🛒 Carrito (<span id="contador">0</span>)</a></li>
+    </ul>
+  </nav>
+
+  <div class="galeria-header">
+    <h2>Nuestros Amigos Felices 🐾</h2>
+    <p>Conoce a las mascotas que visitan Animalandia</p>
+    <button class="btn-agregar-foto" onclick="abrirModal()">📷 Agregar foto</button>
+  </div>
+
+  <div class="filtros-galeria">
+    <button class="filtro-btn active" onclick="setFiltro(this,'')">Todos</button>
+    <button class="filtro-btn" onclick="setFiltro(this,'Perro')">🐶 Perros</button>
+    <button class="filtro-btn" onclick="setFiltro(this,'Gato')">🐱 Gatos</button>
+    <button class="filtro-btn" onclick="setFiltro(this,'Loro')">🦜 Loros</button>
+    <button class="filtro-btn" onclick="setFiltro(this,'Pez')">🐠 Peces</button>
+  </div>
+
+  <div class="galeria-grid" id="grid"></div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="cerrarLightbox(event)">
+    <button class="lightbox-close" onclick="cerrarLightbox(null)">&times;</button>
+    <div class="lightbox-inner">
+      <img id="lb-img" src="" alt="">
+      <div class="lightbox-info">
+        <h3 id="lb-titulo"></h3>
+        <p id="lb-desc"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal agregar foto -->
+  <div class="modal-overlay" id="modalOverlay" onclick="cerrarModal(event)">
+    <div class="modal-box">
+      <h3>📷 Agregar nueva foto</h3>
+
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="inputArchivo" accept="image/*" onchange="previsualizarImagen(this)">
+        <span class="dz-icon" id="dzIcon">🖼️</span>
+        <p class="dz-text" id="dzText">Arrastra tu foto aquí o <strong>haz clic para seleccionar</strong></p>
+        <img id="previewImg" src="" alt="Vista previa">
+      </div>
+
+      <div class="form-row">
+        <label>Nombre de la mascota *</label>
+        <input type="text" id="fTitulo" placeholder="Ej: Max, Luna, Paco...">
+      </div>
+      <div class="form-row">
+        <label>Descripción (opcional)</label>
+        <textarea id="fDescripcion" placeholder="Cuéntanos algo de esta mascota..."></textarea>
+      </div>
+      <div class="form-row">
+        <label>Tipo de mascota</label>
+        <select id="fMascota">
+          <option value="">— Seleccionar —</option>
+          <option value="Perro">🐶 Perro</option>
+          <option class="filtro-btn" value="Gato">🐱 Gato</option>
+          <option value="Loro">🦜 Loro</option>
+          <option value="Pez">🐠 Pez</option>
+          <option value="Otro">🐾 Otro</option>
+        </select>
+      </div>
+
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="cerrarModal(null)">Cancelar</button>
+        <button class="btn-guardar" id="btnGuardar" onclick="subirFoto()">Subir foto</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin — Animalandia</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    /* ── Layout ── */
+    body { background: #f4f1ec; }
+
+    .admin-header {
+      background: #2d1a00;
+      color: #fff;
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .admin-header h1 { font-size: 20px; font-weight: 700; }
+    .admin-header a {
+      color: #ffc285;
+      font-size: 13px;
+      text-decoration: none;
+    }
+    .admin-header a:hover { text-decoration: underline; }
+
+    .admin-body {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+
+    /* ── Barra superior ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .toolbar h2 { font-size: 22px; color: #2d1a00; }
+
+    .btn-nuevo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: #ff7b00;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-nuevo:hover { background: #e06600; transform: none; }
+
+    /* ── Tabla de productos ── */
+    .tabla-wrap {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: #fff8f0;
+      border-bottom: 2px solid #ffe0c0;
+    }
+
+    th {
+      padding: 13px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      color: #7a4500;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f5ede3;
+      transition: background .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fffaf5; }
+
+    td {
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #333;
+      vertical-align: middle;
+    }
+
+    /* Miniatura */
+    .thumb-wrap {
+      position: relative;
+      width: 62px;
+      height: 62px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff3e0;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity .2s;
+    }
+    .thumb-wrap:hover img { opacity: .6; }
+    .thumb-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity .2s;
+      font-size: 20px;
+    }
+    .thumb-wrap:hover .thumb-overlay { opacity: 1; }
+    .thumb-input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .nombre-cell { font-weight: 600; color: #2d1a00; max-width: 180px; }
+    .precio-cell { font-weight: 700; color: #ff7b00; }
+
+    .badge-cat {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #fff3e0;
+      color: #c05c00;
+    }
+
+    .stock-num { font-weight: 700; }
+    .stock-num.ok  { color: #1a7a3f; }
+    .stock-num.low { color: #b85c00; }
+    .stock-num.out { color: #c0392b; }
+
+    /* Acciones */
+    .acciones { display: flex; gap: 6px; align-items: center; }
+
+    .btn-editar {
+      padding: 6px 14px;
+      background: #fff3e0;
+      color: #c05c00;
+      border: 1.5px solid #ffc285;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-editar:hover { background: #ff7b00; color: #fff; border-color: #ff7b00; transform: none; }
+
+    .btn-borrar {
+      padding: 6px 10px;
+      background: #fff0f0;
+      color: #c0392b;
+      border: 1.5px solid #f5c6c6;
+      border-radius: 7px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-borrar:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; transform: none; }
+
+    /* ── Modal editar / crear ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 3000; opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal-box {
+      background: #fff; border-radius: 20px; padding: 32px;
+      max-width: 520px; width: 95%;
+      box-shadow: 0 24px 64px rgba(0,0,0,.25);
+      transform: scale(.94); transition: transform .25s;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-overlay.open .modal-box { transform: scale(1); }
+
+    .modal-title {
+      font-size: 18px; font-weight: 700; color: #2d1a00;
+      margin-bottom: 22px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+
+    .field label {
+      display: block; font-size: 12px; font-weight: 700;
+      color: #7a4500; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px;
+    }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%; box-sizing: border-box;
+      padding: 9px 12px;
+      border: 1.5px solid #e0d0c0; border-radius: 8px;
+      font-size: 14px; outline: none;
+      transition: border-color .2s; font-family: inherit; color: #2d1a00;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus { border-color: #ff7b00; }
+    .field textarea { resize: vertical; min-height: 72px; }
+
+    /* Zona imagen en modal */
+    .img-upload-zone {
+      border: 2px dashed #ffc285; border-radius: 12px;
+      padding: 20px; text-align: center; cursor: pointer;
+      transition: all .2s; position: relative; background: #fffaf5;
+    }
+    .img-upload-zone.over { border-color: #ff7b00; background: #fff3e0; }
+    .img-upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .img-upload-zone img {
+      max-height: 100px; border-radius: 8px; display: block; margin: 0 auto 8px;
+    }
+    .img-upload-zone p { font-size: 13px; color: #888; margin: 0; }
+    .img-upload-zone p strong { color: #ff7b00; }
+
+    .modal-footer { display: flex; gap: 10px; margin-top: 22px; }
+
+    .btn-cancelar {
+      flex: 1; padding: 11px; background: #fff;
+      border: 1.5px solid #ddd; border-radius: 9px;
+      font-size: 14px; cursor: pointer; color: #555; font-weight: 600;
+      transition: background .15s;
+    }
+    .btn-cancelar:hover { background: #f5f5f5; transform: none; }
+
+    .btn-guardar {
+      flex: 2; padding: 11px; background: #ff7b00; border: none;
+      border-radius: 9px; color: #fff; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-guardar:hover { background: #e06600; transform: none; }
+    .btn-guardar:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: #2d1a00; color: #fff;
+      padding: 12px 22px; border-radius: 12px;
+      font-size: 14px; opacity: 0; pointer-events: none;
+      transition: opacity .3s; z-index: 9999;
+    }
+    #toast.show { opacity: 1; }
+
+    /* ── Loading ── */
+    .skeleton {
+      background: linear-gradient(90deg, #f0e8dc 25%, #fdf5eb 50%, #f0e8dc 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 6px; height: 16px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ── Stats ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: #fff; border-radius: 14px;
+      padding: 18px 22px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    }
+    .stat-card .stat-num { font-size: 28px; font-weight: 800; color: #ff7b00; }
+    .stat-card .stat-label { font-size: 12px; color: #999; margin-top: 2px; }
+
+    /* Progreso upload */
+    .prog-wrap {
+      height: 5px; background: #f0e8dc; border-radius: 4px;
+      margin-top: 8px; display: none; overflow: hidden;
+    }
+    .prog-bar {
+      height: 100%; background: #ff7b00; width: 0%;
+      transition: width .3s; border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header admin -->
+  <div class="admin-header">
+    <h1>⚙️ Panel de Administración — Animalandia</h1>
+    <a href="index.html">← Volver a la tienda</a>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- Stats -->
+    <div class="stats" id="stats">
+      <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Productos totales</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-stock">—</div><div class="stat-label">En stock</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-agotados">—</div><div class="stat-label">Sin stock</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-cats">—</div><div class="stat-label">Categorías</div></div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <h2>📦 Productos</h2>
+      <button class="btn-nuevo" onclick="abrirModalNuevo()">+ Nuevo producto</button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Foto</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ── Modal crear / editar ── -->
+  <div class="modal-overlay" id="modalOverlay" onclick="cerrarModal(event)">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span id="modalIcon">📦</span>
+        <span id="modalTitulo">Nuevo producto</span>
+      </div>
+
+      <input type="hidden" id="fId">
+
+      <div class="form-grid">
+        <div class="field full">
+          <label>Imagen del producto</label>
+          <div class="img-upload-zone" id="imgZone">
+            <input type="file" id="fImagen" accept="image/*" onchange="previsualizarModal(this)">
+            <img id="imgPreview" src="" alt="" style="display:none">
+            <p><strong>Haz clic o arrastra</strong> para subir una foto</p>
+          </div>
+          <div class="prog-wrap" id="progWrap"><div class="prog-bar" id="progBar"></div></div>
+        </div>
+
+        <div class="field full">
+          <label>Nombre *</label>
+          <input type="text" id="fNombre" placeholder="Ej: Alimento Premium Perro">
+        </div>
+
+        <div class="field">
+          <label>Precio *</label>
+          <input type="number" id="fPrecio" placeholder="0.00" min="0" step="0.01">
+        </div>
+
+        <div class="field">
+          <label>Stock</label>
+          <input type="number" id="fStock" placeholder="0" min="0">
+        </div>
+
+        <div class="field">
+          <label>Categoría</label>
+          <select id="fCategoria">
+            <option value="">— Sin categoría —</option>
+            <option value="perros">🐶 Perros</option>
+            <option value="gatos">🐱 Gatos</option>
+            <option value="aves">🦜 Aves</option>
+            <option value="peces">🐠 Peces</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label>Descripción</label>
+          <textarea id="fDescripcion" placeholder="Describe el producto..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancelar" onclick="cerrarModal(null)">Cancelar</button>
+        <button class="btn-guardar" id="btnGuardar" onclick="guardarProducto()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    let productos    = [];
+    let imagenNueva  = null;   // File seleccionado en el modal
+
+    /* ── Carga y render ─────────────────────────────────────────────────── */
+    async function cargarProductos() {
+      const res = await fetch('/api/productos');
+      productos = await res.json();
+      renderTabla(productos);
+      renderStats(productos);
+    }
+
+    function renderStats(lista) {
+      document.getElementById('stat-total').textContent    = lista.length;
+      document.getElementById('stat-stock').textContent    = lista.filter(p => (p.stock ?? 0) > 0).length;
+      document.getElementById('stat-agotados').textContent = lista.filter(p => (p.stock ?? 0) === 0).length;
+      const cats = new Set(lista.map(p => p.categoria).filter(Boolean));
+      document.getElementById('stat-cats').textContent = cats.size;
+    }
+
+    function renderTabla(lista) {
+      const tbody = document.getElementById('tbody');
+      if (!lista.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:#bbb">No hay productos</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = lista.map(p => {
+        const stock = p.stock ?? 0;
+        const stockClass = stock === 0 ? 'out' : stock < 10 ? 'low' : 'ok';
+        const catEmoji = { perros:'🐶', gatos:'🐱', aves:'🦜', peces:'🐠' };
+        return `
+          <tr>
+            <td>
+              <div class="thumb-wrap" title="Haz clic para cambiar la foto">
+                <img id="thumb-${p.id}"
+                     src="${p.imagen_url || '/static/foto1.jpg'}"
+                     alt="${p.nombre}"
+                     onerror="this.src='/static/foto1.jpg'">
+                <div class="thumb-overlay">📷</div>
+                <input type="file" accept="image/*" class="thumb-input"
+                       onchange="subirImagenDirecta(${p.id}, this)">
+              </div>
+            </td>
+            <td class="nombre-cell">${p.nombre}</td>
+            <td>
+              ${p.categoria
+                ? `<span class="badge-cat">${catEmoji[p.categoria] || '🐾'} ${p.categoria}</span>`
+                : '<span style="color:#ccc">—</span>'}
+            </td>
+            <td class="precio-cell">$${parseFloat(p.precio).toFixed(2)}</td>
+            <td><span class="stock-num ${stockClass}">${stock}</span></td>
+            <td>
+              <div class="acciones">
+                <button class="btn-editar" onclick="abrirModalEditar(${p.id})">✏️ Editar</button>
+                <button class="btn-borrar" onclick="eliminarProducto(${p.id})">🗑</button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    /* ── Subida de imagen directo desde la miniatura ────────────────────── */
+    async function subirImagenDirecta(productoId, input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('imagen', file);
+
+      mostrarToast('⏳ Subiendo imagen...');
+
+      const res  = await fetch(`/api/productos/${productoId}/imagen`, {
+        method: 'POST', body: formData
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Actualizar miniatura en la tabla sin recargar todo
+        const thumb = document.getElementById(`thumb-${productoId}`);
+        if (thumb) thumb.src = data.imagen_url + '?t=' + Date.now();
+        // Actualizar en el array local
+        const idx = productos.findIndex(p => p.id === productoId);
+        if (idx !== -1) productos[idx].imagen_url = data.imagen_url;
+        mostrarToast('✅ Foto actualizada');
+      } else {
+        mostrarToast('❌ Error al subir la imagen');
+      }
+      input.value = '';  // reset para permitir subir la misma foto de nuevo
+    }
+
+    /* ── Modal nuevo ────────────────────────────────────────────────────── */
+    function abrirModalNuevo() {
+      resetModal();
+      document.getElementById('modalIcon').textContent   = '📦';
+      document.getElementById('modalTitulo').textContent = 'Nuevo producto';
+      document.getElementById('btnGuardar').textContent  = 'Crear producto';
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    /* ── Modal editar ───────────────────────────────────────────────────── */
+    function abrirModalEditar(id) {
+      const p = productos.find(x => x.id === id);
+      if (!p) return;
+      resetModal();
+      document.getElementById('modalIcon').textContent   = '✏️';
+      document.getElementById('modalTitulo').textContent = 'Editar producto';
+      document.getElementById('btnGuardar').textContent  = 'Guardar cambios';
+      document.getElementById('fId').value          = p.id;
+      document.getElementById('fNombre').value      = p.nombre    || '';
+      document.getElementById('fPrecio').value      = p.precio    || '';
+      document.getElementById('fStock').value       = p.stock     ?? 0;
+      document.getElementById('fCategoria').value   = p.categoria || '';
+      document.getElementById('fDescripcion').value = p.descripcion || '';
+
+      if (p.imagen_url) {
+        const img = document.getElementById('imgPreview');
+        img.src   = p.imagen_url;
+        img.style.display = 'block';
+      }
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function cerrarModal(e) {
+      if (!e || e.target === document.getElementById('modalOverlay')) {
+        document.getElementById('modalOverlay').classList.remove('open');
+        resetModal();
+      }
+    }
+
+    function resetModal() {
+      ['fId','fNombre','fPrecio','fDescripcion'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('fStock').value     = '';
+      document.getElementById('fCategoria').value = '';
+      document.getElementById('fImagen').value    = '';
+      const img = document.getElementById('imgPreview');
+      img.src = ''; img.style.display = 'none';
+      document.getElementById('progWrap').style.display = 'none';
+      document.getElementById('progBar').style.width    = '0%';
+      document.getElementById('btnGuardar').disabled    = false;
+      imagenNueva = null;
+    }
+
+    function previsualizarModal(input) {
+      const file = input.files[0];
+      if (!file) return;
+      imagenNueva = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.getElementById('imgPreview');
+        img.src = e.target.result;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Drag & drop en el modal
+    const iz = document.getElementById('imgZone');
+    if (iz) {
+      iz.addEventListener('dragover',  e => { e.preventDefault(); iz.classList.add('over'); });
+      iz.addEventListener('dragleave', () => iz.classList.remove('over'));
+      iz.addEventListener('drop', e => {
+        e.preventDefault(); iz.classList.remove('over');
+        const file = e.dataTransfer.files[0];
+        if (!file) return;
+        imagenNueva = file;
+        const dt = new DataTransfer(); dt.items.add(file);
+        document.getElementById('fImagen').files = dt.files;
+        previsualizarModal(document.getElementById('fImagen'));
+      });
+    }
+
+    /* ── Guardar (crear o actualizar) ───────────────────────────────────── */
+    async function guardarProducto() {
+      const id     = document.getElementById('fId').value;
+      const nombre = document.getElementById('fNombre').value.trim();
+      const precio = parseFloat(document.getElementById('fPrecio').value);
+
+      if (!nombre)        { mostrarToast('⚠️ El nombre es obligatorio'); return; }
+      if (isNaN(precio))  { mostrarToast('⚠️ El precio es obligatorio'); return; }
+
+      const body = {
+        nombre,
+        precio,
+        stock:       parseInt(document.getElementById('fStock').value) || 0,
+        categoria:   document.getElementById('fCategoria').value || null,
+        descripcion: document.getElementById('fDescripcion').value || null,
+        imagen_url:  null
+      };
+
+      // Si hay imagen nueva, subimos primero (solo en edición con id)
+      // Para nuevo producto, primero creamos y luego subimos la imagen
+      document.getElementById('btnGuardar').disabled = true;
+
+      let productoId = id ? parseInt(id) : null;
+
+      // 1. Crear o actualizar datos
+      const method = productoId ? 'PUT' : 'POST';
+      const url    = productoId ? `/api/productos/${productoId}` : '/api/productos';
+
+      // Si es nuevo y no hay imagen nueva, enviamos sin imagen
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        mostrarToast('❌ ' + (err.error || 'Error al guardar'));
+        document.getElementById('btnGuardar').disabled = false;
+        return;
+      }
+
+      const saved = await res.json();
+      productoId  = saved.id;
+
+      // 2. Si hay imagen, subirla ahora
+      if (imagenNueva) {
+        const pw = document.getElementById('progWrap');
+        const pb = document.getElementById('progBar');
+        pw.style.display = 'block';
+        let prog = 0;
+        const iv = setInterval(() => { prog = Math.min(prog + 15, 85); pb.style.width = prog + '%'; }, 80);
+
+        const fd = new FormData();
+        fd.append('imagen', imagenNueva);
+        const imgRes = await fetch(`/api/productos/${productoId}/imagen`, {
+          method: 'POST', body: fd
+        });
+        clearInterval(iv);
+        pb.style.width = '100%';
+        if (!imgRes.ok) mostrarToast('⚠️ Producto guardado pero falló la imagen');
+      }
+
+      mostrarToast(id ? '✅ Producto actualizado' : '✅ Producto creado');
+      setTimeout(() => { cerrarModal(null); cargarProductos(); }, 350);
+    }
+
+    /* ── Eliminar ───────────────────────────────────────────────────────── */
+    async function eliminarProducto(id) {
+      const p = productos.find(x => x.id === id);
+      if (!confirm(`¿Eliminar "${p?.nombre}"? Esta acción no se puede deshacer.`)) return;
+      const res = await fetch(`/api/productos/${id}`, { method: 'DELETE' });
+      if (res.ok) { mostrarToast('🗑️ Producto eliminado'); cargarProductos(); }
+      else mostrarToast('❌ Error al eliminar');
+    }
+
+    /* ── Utilidades ─────────────────────────────────────────────────────── */
+    function mostrarToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') cerrarModal(null);
+    });
+
+    cargarProductos();
+  </script>
+</body>
+</html>

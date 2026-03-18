@@ -2,39 +2,29 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Carrito - Animalandia</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito — Animalandia</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
   <nav class="navbar">
-    <div class="logo">
-      <h1>🐾 Animalandia</h1>
-    </div>
+    <div class="logo"><h1>🐾 Animalandia</h1></div>
     <ul class="nav-links">
       <li><a href="index.html">Inicio</a></li>
-      <li><a href="index.html#productos">Productos</a></li>
-      <li>
-        <a href="carrito.html">
-          🛒 Carrito (<span id="contador">0</span>)
-        </a>
-      </li>
+      <li><a href="productos.html">Productos</a></li>
+      <li><a href="galeria.html">Galería</a></li>
+      <li><a href="carrito.html">🛒 Carrito (<span id="contador">0</span>)</a></li>
     </ul>
   </nav>
 
-  <main class="carrito-container">
-    <h2>Mi Carrito 🐾</h2>
-
-    <ul id="listaCarrito" class="lista-carrito"></ul>
-
-    <h3>Total: $<span id="total">0</span></h3>
-
-    <button class="btn-vaciar" onclick="vaciarCarrito()">
-      Vaciar Carrito
-    </button>
+  <main class="carrito-wrapper">
+    <h2>Mi Carrito 🛒</h2>
+    <div id="carrito-contenido"></div>
   </main>
 
-  <script src="/static/script.js"></script>
+  <div id="toast"></div>
 
+  <script src="/static/script.js"></script>
 </body>
 </html>
